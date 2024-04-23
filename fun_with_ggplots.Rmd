@@ -1,33 +1,19 @@
--   [1 Introduction: Fun with GGplots](#introduction-fun-with-ggplots)
-    -   [1.1 read in data](#read-in-data)
--   [2 Plot Set 1](#plot-set-1)
-    -   [2.1 Plot Set 1: Plot 1](#plot-set-1-plot-1)
-    -   [2.2 Plot Set 1: Plot 2](#plot-set-1-plot-2)
-    -   [2.3 Plot Set 1: Plot 3](#plot-set-1-plot-3)
-    -   [2.4 Plot 1: combine p1, p2, p3](#plot-1-combine-p1-p2-p3)
--   [3 Plot Set 2](#plot-set-2)
-    -   [3.1 Plot Set 2: Plot 1](#plot-set-2-plot-1)
-    -   [3.2 Plot Set 2: Plot 2](#plot-set-2-plot-2)
-    -   [3.3 Plot Set 2: Plot 3](#plot-set-2-plot-3)
-    -   [3.4 Plot Set 2: Plot 4](#plot-set-2-plot-4)
-    -   [3.5 Plot Set 2: combine p1, p2, p3,
-        p4](#plot-set-2-combine-p1-p2-p3-p4)
--   [4 Plot Set 3](#plot-set-3)
-    -   [4.1 Plot Set 3: Plot 1](#plot-set-3-plot-1)
-    -   [4.2 Plot Set 3: Plot 2](#plot-set-3-plot-2)
-    -   [4.3 Plot Set 3: Plot 3](#plot-set-3-plot-3)
-    -   [4.4 Plot Set 3: Plot 4](#plot-set-3-plot-4)
--   [5 Plot Set 3: combine p1, p2, p3,
-    p4](#plot-set-3-combine-p1-p2-p3-p4)
+---
+title: "README"
+output:
+  md_document:
+    variant: markdown_github
+    toc: true # table of content true
+    toc_depth: 3  # upto three depths of headings (specified by #, ## and ###)
+    number_sections: true  ## if you want number sections at each table header
+    
+---
 
-# 1 Introduction: Fun with GGplots
+# Introduction: Fun with GGplots
 
-Honestly, this is just a repository of code that took me forever to get
-to work and format. It includes the following: faceting plots,
-formatting (scatter, box, bar, alluvial, etc.), adding significance bars
-ONTO a facetted plot, and grid.align
+Honestly, this is just a repository of code that took me forever to get to work and format. It includes the following: faceting plots, formatting (scatter, box, bar, alluvial, etc.), adding significance bars ONTO a facetted plot, and grid.align
 
-``` r
+```{r, message=FALSE, warning=FALSE}
 require(mixOmics)
 require(tidygraph)
 require(ggraph)
@@ -45,13 +31,13 @@ require(dplyr)
 require(tidyr)
 ```
 
-``` r
+
+```{r setup}
 knitr::opts_knit$set(root.dir = "C:/Users/ksugino/Desktop/Github_projects/fun_with_ggplots/")
 ```
 
-## 1.1 read in data
-
-``` r
+## read in data
+```{r}
 # microbiome species 
 sp_delta<-read.csv("species_delta.csv")
 
@@ -69,11 +55,11 @@ diet<-read.csv("diet_group.csv")
 diet<-factor(diet$x)
 ```
 
-# 2 Plot Set 1
+# Plot Set 1
 
-## 2.1 Plot Set 1: Plot 1
+## Plot Set 1: Plot 1
 
-``` r
+```{r}
 # DIABLO integration of Microbiota and metabolites
 # set up analysis using optimal model parameters (determined through DIABLO tuning of parameters http://mixomics.org/mixdiablo/diablo-tcga-case-study/)
 X <- list(Microbiota=sp_delta,
@@ -131,22 +117,12 @@ p1<-ggplot(df.union)+
   geom_vline(xintercept=0, col="black")
 ```
 
-## 2.2 Plot Set 1: Plot 2
+## Plot Set 1: Plot 2
 
-``` r
+```{r}
 # pull sPLS-DA loadings and combine them into a melt data frame
 p1_loadings_micro<-plotLoadings(final.diablo.model, block = 1, comp = 1, contrib = 'max', method = 'mean')
-```
-
-![](fun_with_ggplots_files/figure-markdown_github/unnamed-chunk-4-1.png)
-
-``` r
 p1_loadings_metabo<-plotLoadings(final.diablo.model, block = 2, comp = 1, contrib = 'max', method = 'mean')
-```
-
-![](fun_with_ggplots_files/figure-markdown_github/unnamed-chunk-4-2.png)
-
-``` r
 p1_loadings_all<-rbind(p1_loadings_micro,p1_loadings_metabo)
 
 # recolor the loading names base on whether they're a microbe or metabolite
@@ -190,20 +166,13 @@ p2<-ggplot(p1_loadings_all, aes(x=importance,
   xlim(c(-0.6,0.6))
 ```
 
-    ## Warning: Vectorized input to `element_text()` is not officially supported.
-    ## i Results may be unexpected or may change in future versions of ggplot2.
+## Plot Set 1: Plot 3
 
-## 2.3 Plot Set 1: Plot 3
-
-``` r
+```{r}
 # set up data from metaboINDICATOR summed values
 bioc.temp<-data.frame(diet,metabo_ind_delta)
 temp_melt<-melt(bioc.temp)
-```
 
-    ## Using diet as id variables
-
-``` r
 # re-order the factor levels
 temp_melt$variable<-factor(temp_melt$variable,
                            levels=c("TMAO_Synthesis",
@@ -274,9 +243,9 @@ p3<-ggplot(temp_melt,aes(x=variable, y=value,fill=diet))+
   facet_grid(category~., scales = "free", space = "free")
 ```
 
-## 2.4 Plot 1: combine p1, p2, p3
+## Plot 1: combine p1, p2, p3
 
-``` r
+```{r,fig.height=9.843,fig.width=9.843}
 lay <- rbind(c(1,1,1,3,3,3),
              c(2,2,2,3,3,3),
              c(2,2,2,3,3,3))
@@ -285,15 +254,12 @@ lay <- rbind(c(1,1,1,3,3,3),
 grid.arrange(p1,p2,p3, layout_matrix = lay, heights=c(.8,1,1))
 ```
 
-    ## Warning: Removed 1 rows containing missing values (`position_stack()`).
+# Plot Set 2
 
-![](fun_with_ggplots_files/figure-markdown_github/unnamed-chunk-6-1.png)
+## Plot Set 2: Plot 1
 
-# 3 Plot Set 2
 
-## 3.1 Plot Set 2: Plot 1
-
-``` r
+```{r}
 # DIABLO integration of microbiota KEGG gene annotations and metabolites
 X <- list(Microbial_genes=kegg_delta,
           Metabolomics=metabo_delta)
@@ -351,22 +317,14 @@ p1<-ggplot(df.union)+
   geom_vline(xintercept=0, col="black")
 ```
 
-## 3.2 Plot Set 2: Plot 2
+## Plot Set 2: Plot 2
 
-``` r
+
+```{r}
+
 # pull sPLS-DA loadings for comp 1 and combine them into a melt data frame
 p1_loadings_micro<-plotLoadings(final.diablo.model, block = 1, comp = 1, contrib = 'max', method = 'mean')
-```
-
-![](fun_with_ggplots_files/figure-markdown_github/unnamed-chunk-8-1.png)
-
-``` r
 p1_loadings_metabo<-plotLoadings(final.diablo.model, block = 2, comp = 1, contrib = 'max', method = 'mean')
-```
-
-![](fun_with_ggplots_files/figure-markdown_github/unnamed-chunk-8-2.png)
-
-``` r
 p1_loadings_all<-rbind(p1_loadings_micro,p1_loadings_metabo)
 
 # recolor the loading names base on whether they're a gene or metabolite
@@ -411,25 +369,13 @@ p2<-ggplot(p1_loadings_all, aes(x=importance,y=reorder(rownames(p1_loadings_all)
   xlim(c(-0.6,0.6))
 ```
 
-    ## Warning: Vectorized input to `element_text()` is not officially supported.
-    ## i Results may be unexpected or may change in future versions of ggplot2.
+## Plot Set 2: Plot 3
 
-## 3.3 Plot Set 2: Plot 3
 
-``` r
+```{r}
 # pull sPLS-DA loadings for comp 2 and combine them into a melt data frame
 p1_loadings2_micro<-plotLoadings(final.diablo.model, block = 1, comp = 2, contrib = 'max', method = 'mean')
-```
-
-![](fun_with_ggplots_files/figure-markdown_github/unnamed-chunk-9-1.png)
-
-``` r
 p1_loadings2_metabo<-plotLoadings(final.diablo.model, block = 2, comp = 2, contrib = 'max', method = 'mean')
-```
-
-![](fun_with_ggplots_files/figure-markdown_github/unnamed-chunk-9-2.png)
-
-``` r
 p1_loadings2_all<-rbind(p1_loadings2_micro,p1_loadings2_metabo)
 
 # recolor the loading names base on whether they're a gene or metabolite
@@ -474,12 +420,10 @@ p3<-ggplot(p1_loadings2_all, aes(x=importance,y=reorder(rownames(p1_loadings2_al
   coord_flip()
 ```
 
-    ## Warning: Vectorized input to `element_text()` is not officially supported.
-    ## i Results may be unexpected or may change in future versions of ggplot2.
+## Plot Set 2: Plot 4
 
-## 3.4 Plot Set 2: Plot 4
 
-``` r
+```{r}
 # read in over-representation analysis of KEGG genes identified above
 ora_diet<-read.csv("ORA_diet_results.csv")
 ora_diet$sig<-ifelse(ora_diet$p.adjust<0.05, "sig","non-sig")
@@ -541,44 +485,31 @@ p4<-ggplot(as.data.frame(ora_alluvial),
         legend.position="top")
 ```
 
-## 3.5 Plot Set 2: combine p1, p2, p3, p4
+## Plot Set 2: combine p1, p2, p3, p4
 
-``` r
+```{r,fig.height=13.775,fig.width=17.717}
 # plot everything together! 
 # here I do two layouts to arrange the grid (mostly just testing different ways to assemble them)
 lay1 <- rbind(c(1,1,1),
               c(2,2,2),
               c(2,2,2))
 grid1<-grid.arrange(p1,p2, layout_matrix = lay1, heights=c(.8,1,1))
-```
 
-    ## Warning: Removed 2 rows containing missing values (`geom_point()`).
 
-    ## Warning: Removed 2 rows containing missing values (`geom_segment()`).
-
-![](fun_with_ggplots_files/figure-markdown_github/unnamed-chunk-11-1.png)
-
-``` r
 lay2 <- rbind(c(1,1,1),
               c(2,2,2),
               c(2,2,2))
 grid2<-grid.arrange(p3,p4, layout_matrix = lay2, heights=c(0.8,1,1))
-```
 
-![](fun_with_ggplots_files/figure-markdown_github/unnamed-chunk-11-2.png)
-
-``` r
 # now we plot them together
 grid.arrange(grid1, grid2, ncol=2)
 ```
 
-![](fun_with_ggplots_files/figure-markdown_github/unnamed-chunk-11-3.png)
+# Plot Set 3
 
-# 4 Plot Set 3
+## Plot Set 3: Plot 1
 
-## 4.1 Plot Set 3: Plot 1
-
-``` r
+```{r}
 # categorize participants into 2 K-means groupings by the change in metabolomics after diet intervention
 # seed set to 111 to maintain consistent output of groupings
 set.seed(111)
@@ -625,17 +556,14 @@ p1<-ggplot(k_coord,aes(x= x, y= y, fill=cluster, col=cluster))+
   geom_vline(xintercept=0, col="black")
 ```
 
-## 4.2 Plot Set 3: Plot 2
+## Plot Set 3: Plot 2
 
-``` r
+
+```{r}
 # MetaboINDICATOR values vs K-cluster
 bioc.temp<-data.frame(kgrp,metabo_ind_delta)
 temp_melt<-melt(bioc.temp)
-```
 
-    ## Using kgrp as id variables
-
-``` r
 temp_melt$variable<-factor(temp_melt$variable,
                            levels=c("TMAO_Synthesis",
                                     "BA_2nd_BA_1st","BA_2nd_Conjugation","BA_2nd_Synthesis",
@@ -730,23 +658,17 @@ p2<-ggplot(temp_melt,aes(x=variable, y=value, fill=category))+
   geom_hline(yintercept=0, col="black")
 ```
 
-    ## Warning in geom_signif(data = annotation_df, aes(y_position = y, xmin = start,
-    ## : Ignoring unknown aesthetics: y_position, xmin, xmax, and annotations
+## Plot Set 3: Plot 3
 
-## 4.3 Plot Set 3: Plot 3
 
-``` r
+```{r}
 # read in LASSO/ANOVA results
 kgrp_taxa<-read.csv("kgrp_taxa.csv")
 
 # pull out just terms significant before FDR (since nothing was significant after FDR)
 temp_sig<-data.frame(kgrp,sp_delta[,colnames(sp_delta)%in%kgrp_taxa$compound[kgrp_taxa$pval<0.05]])
 sig_melt<-melt(temp_sig)
-```
 
-    ## Using kgrp as id variables
-
-``` r
 p3<-ggplot(sig_melt,aes(x=variable, y=value, fill=kgrp))+
   geom_boxplot()+
   facet_wrap(~variable, scales = "free")+
@@ -765,9 +687,10 @@ p3<-ggplot(sig_melt,aes(x=variable, y=value, fill=kgrp))+
   geom_hline(yintercept=0, col="black")
 ```
 
-## 4.4 Plot Set 3: Plot 4
+## Plot Set 3: Plot 4
 
-``` r
+
+```{r}
 # read in over-representation analysis of KEGG genes identified by LASSO regression (not done here)
 ora_kgrp<-read.csv("ORA_kgrp_results.csv")
 ora_kgrp$sig<-ifelse(ora_kgrp$p.adjust<0.05, "sig","non-sig")
@@ -833,9 +756,9 @@ p4<-ggplot(as.data.frame(ora_alluvial),
   scale_fill_manual(values = c("#FEC41E","grey"))
 ```
 
-# 5 Plot Set 3: combine p1, p2, p3, p4
+# Plot Set 3: combine p1, p2, p3, p4
 
-``` r
+```{r,fig.height=13.775,fig.width=15.748}
 #plot it all!
 
 lay <- rbind(c(1,1,1,3,3,3),
@@ -843,5 +766,3 @@ lay <- rbind(c(1,1,1,3,3,3),
              c(2,2,2,4,4,4))
 grid.arrange(p1,p2,p3,p4, layout_matrix = lay, heights=c(.8,1,1))
 ```
-
-![](fun_with_ggplots_files/figure-markdown_github/unnamed-chunk-16-1.png)
